@@ -18,6 +18,10 @@ app.use("/api/readings", readingRoutes);
 app.use("/api/bills", billRoutes);
 app.use("/api/meters",meterRoutes);
 app.use("/api/user", userRoutes)
+
+app.get("/", (req, res) => {
+  res.send("API is running 🚀");
+});
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
