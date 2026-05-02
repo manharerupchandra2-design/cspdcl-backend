@@ -26,6 +26,7 @@ exports.getAllConsumers = async (req, res) => {
     const [rows] = await db.execute("SELECT * FROM consumers");
     res.status(200).json({
       success:true,
+      message:"Fetched all Consumer successfully",
       data:rows});
 
   } catch (error) {
