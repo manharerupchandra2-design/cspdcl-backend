@@ -13,11 +13,11 @@ exports.getMeters = async (req,res)=>{
 
 exports.addMeter =async (req,res)=>{
 try{
-    const {consumer_id,meter_no,meter_type,installed_date,status} = req.body;
+    const {bp_no,meter_no,meter_type,installed_date} = req.body;
 
-    const sql = "INSERT INTO meters(consumer_id,meter_no,meter_type,installed_date,status) VALUES(?,?,?,?,?)";
+    const sql = "INSERT INTO meters(bp_no,meter_no,meter_type,installed_date) VALUES(?,?,?,?)";
 
-    await db.query(sql,[consumer_id,meter_no,meter_type,installed_date,status]);
+    await db.query(sql,[bp_no,meter_no,meter_type,installed_date]);
    
             res.json({message:"Meter Added"});
         }

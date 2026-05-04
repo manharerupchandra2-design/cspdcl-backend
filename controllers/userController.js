@@ -1,6 +1,7 @@
 const db = require("../config/db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+
 exports.userLogin = async (req, res) => {
 
   try {
@@ -25,6 +26,7 @@ exports.userLogin = async (req, res) => {
         success: false,
         message: "Invalid credentials"
       });
+      console.log(isMatch);
     }
 
     const token = jwt.sign({
@@ -33,7 +35,7 @@ exports.userLogin = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "7d" });
 
-    res.json({
+   return res.json({
       success: true,
       message: "Login successfull",
       token,
@@ -45,7 +47,7 @@ exports.userLogin = async (req, res) => {
     });
   } catch (error) {
     console.log(error)
-    res.status(500).json({ success: false, message: "Server error", error });
+    res.status(500).json({ success: false, message: "Server error",});
   }
 };
 
@@ -76,7 +78,6 @@ exports.userSignup = async (req, res) => {
         mobile,
         email,
         hashedPassword
-
       ]
     );
 

@@ -5,12 +5,12 @@ exports.generateBill = async (req, res) => {
 
   try {
 
-    const { consumer_id } = req.body;
+    const { bp_no } = req.params;
 
     // Get consumer
     const [consumer] = await db.execute(
-      "SELECT * FROM consumers WHERE id = ?",
-      [consumer_id]
+      "SELECT * FROM consumers WHERE bp_no = ?",
+      [bp_no]
     );
 
     if (consumer.length === 0) {
@@ -20,16 +20,16 @@ exports.generateBill = async (req, res) => {
     const connectionType = consumer[0].connection_type;
 
     // Get latest reading
-    const [lastReading] = await db.execute(
-      "SELECT * FROM meter_readings WHERE consumer_id = ? ORDER BY id DESC LIMIT 1",
-      [consumer_id]
+    const [previous_reading] = await db.execute(
+      "SELECT * FROM meter_readings WHERE bp_no = ? ORDER BY id DESC LIMIT 1",
+      [bp_no]
     );
 
-    if (lastReading.length === 0) {
+    if (previous_reading.length === 0) {
       return res.status(400).json({ message: "No reading found" });
     }
 
-    const units = lastReading[0].unit_consumed;
+    const units = previous_reading[0].unit_consumed;
 
     // Calculate slab-wise energy charge
     const energyCharge = await calculateEnergyCharge(
@@ -45,11 +45,11 @@ exports.generateBill = async (req, res) => {
     // Insert bill
     await db.execute(
       `INSERT INTO bills 
-      (consumer_id, reading_id, total_unit, energy_charge, fixed_charge, tax, total_amount, bill_date)
+      (bp_no, reading_id, total_unit, energy_charge, fixed_charge, tax, total_amount, bill_date)
       VALUES (?, ?, ?, ?, ?, ?, ?, CURDATE())`,
       [
-        consumer_id,
-        lastReading[0].id,
+        bp_no,
+        previous_reading[0].id,
         units,
         energyCharge,
         fixedCharge,

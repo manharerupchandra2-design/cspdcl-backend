@@ -4,12 +4,12 @@ const db = require("../config/db");
 exports.addReading = async (req, res) => {
   try {
 
-    const { consumer_id, meter_id, reading_value } = req.body;
+    const { bp_no, meter_id, reading_value } = req.body;
 
     // Get last reading
     const [lastReading] = await db.execute(
-      "SELECT * FROM meter_readings WHERE consumer_id = ? ORDER BY id DESC LIMIT 1",
-      [consumer_id]
+      "SELECT * FROM meter_readings WHERE bp_no = ? ORDER BY id DESC LIMIT 1",
+      [bp_no]
     );
 
     const previousReading = lastReading.length > 0
@@ -20,9 +20,9 @@ exports.addReading = async (req, res) => {
 
     await db.execute(
       `INSERT INTO meter_readings 
-      (consumer_id, meter_id, reading_value, previous_reading, unit_consumed)
+      (bp_no, meter_id, reading_value, previous_reading, unit_consumed)
       VALUES (?, ?, ?, ?, ?)`,
-      [consumer_id, meter_id, reading_value, previousReading, units]
+      [bp_no, meter_id, reading_value, previousReading, units]
     );
 
     res.json({
