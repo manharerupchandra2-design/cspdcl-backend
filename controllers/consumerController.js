@@ -68,3 +68,25 @@ exports.removeConsumer = async (req, res) => {
     console.log(req.params.id);
   }
 };
+
+
+exports.getAllConsumersDetail = async (req, res) => {
+  try {
+
+    const {bp_no}=req.params;
+console.log(bp_no);
+    const [rows] = await db.query(`select c.name,c.address,c.mobile,c.bp_no,
+      m.meter_no, m.meter_type,
+      mr.previous_reading, mr.reading_date, mr.reading_value, mr.unit_consumed, 
+      b.bill_date,b.total_amount 
+      from consumers c join meters m on c.bp_no=m.bp_no join meter_readings mr on m.meter_id=mr.meter_id join bills b on b.reading_id=mr.id  
+      where c.bp_no=? order by bill_date desc limit 1;`,[bp_no]);
+    res.status(200).json({
+      success:true,
+      message:"Fetched all consumers detaile successfully",
+      data:rows});
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
