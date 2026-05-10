@@ -19,6 +19,7 @@ exports.userLogin = async (req, res) => {
     }
 
     const user = row[0];
+    
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
@@ -26,7 +27,7 @@ exports.userLogin = async (req, res) => {
         success: false,
         message: "Invalid credentials"
       });
-      console.log(isMatch);
+      
     }
 
     const token = jwt.sign({

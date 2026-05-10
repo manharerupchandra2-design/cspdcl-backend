@@ -2,72 +2,88 @@ const db = require("../config/db");
 const calculateEnergyCharge = require("../utils/calculateBill");
 
 exports.generateBill = async (req, res) => {
-
   try {
-
     const { bp_no } = req.params;
+    const { reading_value } = req.body;
 
-    // Get consumer
-    const [consumer] = await db.execute(
+    if (!reading_value) {
+      return res.status(400).json({ message: "Current reading is required" });
+    }
+
+    // 1. Get consumer details
+    const [consumerData] = await db.execute(
       "SELECT * FROM consumers WHERE bp_no = ?",
       [bp_no]
     );
 
-    if (consumer.length === 0) {
+    if (consumerData.length === 0) {
       return res.status(404).json({ message: "Consumer not found" });
     }
 
-    const connectionType = consumer[0].connection_type;
+    const consumer = consumerData[0];
 
-    // Get latest reading
-    const [previous_reading] = await db.execute(
-      "SELECT * FROM meter_readings WHERE bp_no = ? ORDER BY id DESC LIMIT 1",
+    // 2. Get last reading
+    const [lastReadingData] = await db.execute(
+      "SELECT * FROM meter_readings WHERE bp_no = ? ORDER BY reading_date DESC LIMIT 1",
       [bp_no]
     );
 
-    if (previous_reading.length === 0) {
-      return res.status(400).json({ message: "No reading found" });
+    let previous_reading = 0;
+
+    if (lastReadingData.length > 0) {
+      previous_reading = lastReadingData[0].reading_value;
     }
 
-    const units = previous_reading[0].unit_consumed;
+    // 3. Unit calculation
+    const units =reading_value - previous_reading;
 
-    // Calculate slab-wise energy charge
-    const energyCharge = await calculateEnergyCharge(
-      connectionType,
-      units,
-      db
-    );
+    if (units < 0) {
+      return res.status(400).json({ message: "Invalid reading" });
+    }
 
-    const fixedCharge = 50;
-    const tax = energyCharge * 0.05;
-    const totalAmount = energyCharge + fixedCharge + tax;
+    // 4. Tariff logic (simple slab)
+    let amount = 0;
 
-    // Insert bill
+    if (units <= 100) {
+      amount = units * 3;
+    } else if (units <= 200) {
+      amount = (100 * 3) + (units - 100) * 5;
+    } else {
+      amount = (100 * 3) + (100 * 5) + (units - 200) * 7;
+    }
+
+    // 5. Fixed charge
+    const fixed_charge = consumer.connection_type === "commercial" ? 150 : 50;
+
+    const total_amount = amount + fixed_charge;
+
+    // 6. Save reading
     await db.execute(
-      `INSERT INTO bills 
-      (bp_no, reading_id, total_unit, energy_charge, fixed_charge, tax, total_amount, bill_date)
-      VALUES (?, ?, ?, ?, ?, ?, ?, CURDATE())`,
-      [
-        bp_no,
-        previous_reading[0].id,
-        units,
-        energyCharge,
-        fixedCharge,
-        tax,
-        totalAmount
-      ]
+      "INSERT INTO meter_readings (bp_no, reading_value, previous_reading, unit_consumed) VALUES (?, ?, ?, ?)",
+      [bp_no,  reading_value, previous_reading, units]
     );
 
-    res.json({
-      message: "Bill Generated Successfully",
-      units,
-      energyCharge,
-      fixedCharge,
-      tax,
-      totalAmount
+    // 7. Save bill
+    await db.execute(
+      "INSERT INTO bills (bp_no, total_unit, amount, fixed_charge, total_amount) VALUES (?, ?, ?, ?, ?)",
+      [bp_no, units, total_amount, fixed_charge, total_amount]
+    );
+
+    res.status(200).json({
+      message: "Bill generated successfully",
+      data: {
+        bp_no,
+        previous_reading,
+        reading_value,
+        units,
+        amount,
+        fixed_charge,
+        total_amount,
+      },
     });
 
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
   }
 };
