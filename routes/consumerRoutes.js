@@ -16,3 +16,4 @@ router.get("/:id", getSingleConsumer);
 router.delete("/:id",removeConsumer);
 
 module.exports = router;
+
