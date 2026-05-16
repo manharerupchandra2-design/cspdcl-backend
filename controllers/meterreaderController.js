@@ -2,14 +2,14 @@ const db = require("../config/db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-exports.userLogin = async (req, res) => {
+exports.meterreaderLogin = async (req, res) => {
 
   try {
 
     console.log(req.body);
     const { email, password } = req.body;
 
-    const [row] = await db.execute('SELECT * FROM users where email=?', [email]);
+    const [row] = await db.execute('SELECT * FROM meter_reader where email=?', [email]);
 
     if (row.length === 0) {
       return res.status(404).json({
@@ -52,13 +52,13 @@ exports.userLogin = async (req, res) => {
   }
 };
 
-exports.userSignup = async (req, res) => {
+exports.meterreaderSignup = async (req, res) => {
 
   try {
     console.log(req.body)
     const { name, mobile, email, password } = req.body;
 
-    const checkmobile = "select * from users where mobile=?";
+    const checkmobile = "select * from meter_reader where mobile=?";
     const [result] = await db.query(checkmobile, [mobile]);
 
     if (result.length > 0) {
