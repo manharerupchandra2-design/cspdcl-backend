@@ -25,7 +25,7 @@ exports.meterreaderLogin = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({
         success: false,
-        message: "Invalid credentials"
+        message: "Incorrect Password"
       });
       
     }
