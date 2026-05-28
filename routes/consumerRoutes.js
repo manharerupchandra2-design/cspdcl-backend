@@ -2,18 +2,18 @@ const express = require("express");
 const router = express.Router();
 
 const {
-  addConsumer,
+  // addConsumer,
   getAllConsumers,
-  getAllConsumersDetail,
-  getSingleConsumer,
-  removeConsumer
+  getConsumersPreviousBill,
+  // getSingleConsumer,
+  // removeConsumer
 } = require("../controllers/consumerController");
 
-router.post("/", addConsumer);
+// router.post("/", addConsumer);
 router.get("/", getAllConsumers);
-router.post("/getAllConsumersDetail/:bp_no", getAllConsumersDetail);
-router.get("/:id", getSingleConsumer);
-router.delete("/:id",removeConsumer);
+router.post("/getConsumersPreviousBill/:consumer_no", getConsumersPreviousBill);
+// router.get("/:id", getSingleConsumer);
+// router.delete("/:id",removeConsumer);
 
 module.exports = router;
 
