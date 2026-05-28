@@ -3,7 +3,7 @@ const router = express.Router();
 
 const { generateBill } = require("../controllers/billController");
 
-router.get("/generate/:bp_no", generateBill);
+router.get("/generate/:id", generateBill);
 
 module.exports = router;
 

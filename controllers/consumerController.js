@@ -73,14 +73,17 @@ exports.getSingleConsumer = async (req, res) => {
 exports.getConsumersPreviousBill = async (req, res) => {
   try {
 
-    const {bp_no}=req.params;
-console.log(bp_no);
-    const [rows] = await db.query(`select c.name,c.address,c.mobile,c.consumer_no,
-      m.meter_no, m.meter_type,
-      mr.previous_reading, mr.reading_date, mr.current_reading, mr.units, 
-      b.due_date,b.amount 
-      from consumers c join meters m on c.consumer_no=m.consumers_id join meter_readings mr on m.meter_no=mr.meter_id join bills b on b.reading_id=mr.id  
-      where c.consumer_no=? order by billling_date desc limit 1;`,[consumer_no]);
+    const {id}=req.params;
+console.log(id);
+    const [rows] = await db.query(`select c.name, c.address, c.mobile, c.consumer_no,       
+m.meter_no, m.meter_type,       
+mr.previous_reading, mr.reading_date, mr.current_reading, mr.units,        
+b.due_date,b.amount,b.status        
+from consumers c join meters m on c.id=m.consumer_id 
+join meter_readings mr on c.id=mr.consumer_id 
+join bills b on b.reading_id=mr.id         
+where c.id=1 order by billing_date desc limit 1;
+`,[id]);
     res.status(200).json({
       success:true,
       message:"Fetched all consumers detaile successfully",
