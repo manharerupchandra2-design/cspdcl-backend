@@ -82,7 +82,7 @@ b.due_date,b.amount,b.status
 from consumers c join meters m on c.id=m.consumer_id 
 join meter_readings mr on c.id=mr.consumer_id 
 join bills b on b.reading_id=mr.id         
-where c.id=1 order by billing_date desc limit 1;
+where c.id=? order by billing_date desc limit 1;
 `,[id]);
     res.status(200).json({
       success:true,
