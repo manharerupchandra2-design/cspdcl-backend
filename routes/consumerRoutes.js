@@ -11,7 +11,7 @@ const {
 
 // router.post("/", addConsumer);
 router.get("/", getAllConsumers);
-router.post("/getConsumersPreviousBill/:id", getConsumersPreviousBill);
+router.get("/getConsumersPreviousBill/:id", getConsumersPreviousBill);
 // router.get("/:id", getSingleConsumer);
 // router.delete("/:id",removeConsumer);
 
