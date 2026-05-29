@@ -53,33 +53,30 @@ exports.meterreaderLogin = async (req, res) => {
 };
 
 exports.meterreaderSignup = async (req, res) => {
-
   try {
-    console.log(req.body)
+
     const { name, mobile, email, password } = req.body;
 
-    const checkmobile = "select * from meter_readers where mobile=?";
-    const [result] = await db.query(checkmobile, [mobile]);
+    const checkUser = `
+    SELECT * FROM meter_readers
+    WHERE mobile=? OR email=?`;
+
+    const [result] = await db.query(checkUser, [mobile, email]);
 
     if (result.length > 0) {
       return res.status(400).json({
         success: false,
-        message: "User already exists"
-      })
+        message: "Mobile or Email already exists"
+      });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
     await db.execute(
-      `INSERT INTO meter_readers 
+      `INSERT INTO meter_readers
       (name,mobile,email,password)
       VALUES (?, ?, ?, ?)`,
-      [
-        name,
-        mobile,
-        email,
-        hashedPassword
-      ]
+      [name, mobile, email, hashedPassword]
     );
 
     res.status(201).json({
@@ -88,6 +85,11 @@ exports.meterreaderSignup = async (req, res) => {
     });
 
   } catch (error) {
-    res.status(500).json({ success: false, message: " Server error", error });
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
   }
 };
