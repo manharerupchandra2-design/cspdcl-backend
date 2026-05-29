@@ -7,7 +7,7 @@ const consumerRoutes = require("./routes/consumerRoutes");
 const readingRoutes = require("./routes/readingRoutes");
 const billRoutes = require("./routes/billRoutes");
 const meterRoutes=require("./routes/meterRoutes");
-const meterreaderRoutes=require("./routes/meterreaderRoutes")
+const meterReaderRoutes=require("./routes/meterReaderRoutes")
 
 const app = express();
 
@@ -21,7 +21,7 @@ app.use("/api/consumers", consumerRoutes);
 app.use("/api/readings", readingRoutes);
 app.use("/api/bills", billRoutes);
 app.use("/api/meters",meterRoutes);
-app.use("/api/meterreader", meterreaderRoutes);
+app.use("/api/meter_reader", meterReaderRoutes);
 
 const { verifyToken } = require("./middleware/authMiddleware");
 
