@@ -71,7 +71,7 @@ exports.meterreaderSignup = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     await db.execute(
-      `INSERT INTO meter_reader 
+      `INSERT INTO meter_readers 
       (name,mobile,email,password)
       VALUES (?, ?, ?, ?)`,
       [
