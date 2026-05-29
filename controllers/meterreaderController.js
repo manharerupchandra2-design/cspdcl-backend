@@ -9,7 +9,7 @@ exports.meterreaderLogin = async (req, res) => {
     console.log(req.body);
     const { email, password } = req.body;
 
-    const [row] = await db.execute('SELECT * FROM meter_reader where email=?', [email]);
+    const [row] = await db.execute('SELECT * FROM meter_readers where email=?', [email]);
 
     if (row.length === 0) {
       return res.status(404).json({
