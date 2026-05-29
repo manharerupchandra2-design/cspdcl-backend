@@ -58,7 +58,7 @@ exports.meterreaderSignup = async (req, res) => {
     console.log(req.body)
     const { name, mobile, email, password } = req.body;
 
-    const checkmobile = "select * from meter_reader where mobile=?";
+    const checkmobile = "select * from meter_readers where mobile=?";
     const [result] = await db.query(checkmobile, [mobile]);
 
     if (result.length > 0) {
