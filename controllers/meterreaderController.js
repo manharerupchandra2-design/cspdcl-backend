@@ -55,7 +55,16 @@ exports.meterreaderLogin = async (req, res) => {
 exports.meterreaderSignup = async (req, res) => {
   try {
 
+
+
+
     const { name, mobile, email, password } = req.body;
+    if(!name||!mobile||!email||!password){
+      return res.status().json({
+        success: false,
+        message: "All fields are required"
+      })
+    }
 
     const checkUser = `
     SELECT * FROM meter_readers
