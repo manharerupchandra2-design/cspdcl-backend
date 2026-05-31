@@ -8,6 +8,13 @@ exports.meterreaderLogin = async (req, res) => {
 
     console.log(req.body);
     const { email, password } = req.body;
+    if(!name?.trim()||!email?.trim()){
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required"
+      })
+    }
+
 
     const [row] = await db.execute('SELECT * FROM meter_readers where email=?', [email]);
 
