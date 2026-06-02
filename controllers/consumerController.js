@@ -23,8 +23,15 @@ const db = require("../config/db");
 // Get All Consumers
 exports.getAllConsumers = async (req, res) => {
   try {
-    const [rows] = await db.execute("SELECT * FROM consumers");
+    const [rows] = await db.execute("select consumers.*,meters.meter_no from consumers left join  meters on consumers.id=meters.consumer_id");
     const [total_consumers]= await db.execute("select count(*) as total_consumers from consumers");
+
+    if (rows.length === 0) {
+  return res.status(200).json({
+    success: true,
+    message: "Empty"
+  });
+}
     res.status(200).json({
       success:true,
       message:"Fetched all consumer successfully",
