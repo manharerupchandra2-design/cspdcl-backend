@@ -37,7 +37,7 @@ exports.getAllConsumers = async (req, res) => {
       message:"Fetched all consumer successfully",
       data:{
         consumers:rows,
-        total_consumers:total_consumers
+        total_consumers:total_consumers[0].total_consumers
       }
       
     });
