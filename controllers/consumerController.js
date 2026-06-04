@@ -193,14 +193,14 @@ exports.setReading = async (req, res) => {
   }
 };
 
-exports.setBilling = async (req, res) => {
-  try {
+// exports.setBilling = async (req, res) => {
+//   try {
 
-  } catch (error) {
-    console.log(error)
-    res.status(500).json({
-      success: false,
-      error: error.message
-    })
-  }
-}
+//   } catch (error) {
+//     console.log(error)
+//     res.status(500).json({
+//       success: false,
+//       error: error.message
+//     })
+//   }
+// }
