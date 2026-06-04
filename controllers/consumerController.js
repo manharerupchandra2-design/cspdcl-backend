@@ -24,8 +24,10 @@ const db = require("../config/db");
 exports.getAllConsumers = async (req, res) => {
   try {
     const [rows] = await db.execute(`select consumers.*,
-      meters.meter_no,meters.meter_type from consumers
-      left join  meters on consumers.id=meters.consumer_id`);
+      meters.meter_no,
+      meters.meter_type,
+      meters.id 
+      from consumers left join  meters on consumers.id=meters.consumer_id`);
     const [total_consumers] = await db.execute(`select count(*) as 
       total_consumers from consumers`);
 
