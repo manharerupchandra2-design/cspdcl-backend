@@ -184,7 +184,7 @@ exports.setReading = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Reading submitted",
-      reading_id: result.id
+      reading_id: result.insertId
     });
 
   } catch (error) {
