@@ -1,90 +1,61 @@
 const db = require("../config/db");
 const calculateEnergyCharge = require("../utils/calculateBill");
 
-exports.generateBill = async (req, res) => {
+exports.setBilling = async (req, res) => {
   try {
-    const { bp_no } = req.params;
-    const { reading_value } = req.body;
+    const { reading_id, category } = req.params;
 
-    if (!reading_value) {
-      return res.status(400).json({ message: "Current reading is required" });
-    }
-
-    // 1. Get consumer details
-    const [consumerData] = await db.execute(
-      "SELECT * FROM consumers WHERE bp_no = ?",
-      [bp_no]
+    const [row1] = await db.execute(
+      "SELECT units FROM meter_readings WHERE id=?",
+      [reading_id]
     );
 
-    if (consumerData.length === 0) {
-      return res.status(404).json({ message: "Consumer not found" });
+    if (row1.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Reading not found"
+      });
     }
 
-    const consumer = consumerData[0];
+    const units = row1[0].units;
 
-    // 2. Get last reading
-    const [lastReadingData] = await db.execute(
-      "SELECT * FROM meter_readings WHERE bp_no = ? ORDER BY reading_date DESC LIMIT 1",
-      [bp_no]
+    const [row2] = await db.execute(
+      `SELECT rate_per_unit, fixed_charge
+       FROM tariffs
+       WHERE category=?
+       AND ? BETWEEN min_units AND max_units`,
+      [category, units]
     );
 
-    let previous_reading = 0;
-
-    if (lastReadingData.length > 0) {
-      previous_reading = lastReadingData[0].reading_value;
+    if (row2.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Tariff not found"
+      });
     }
 
-    // 3. Unit calculation
-    const units =reading_value - previous_reading;
+    const rate_per_unit = row2[0].rate_per_unit;
+    const fixed_charge = row2[0].fixed_charge;
 
-    if (units < 0) {
-      return res.status(400).json({ message: "Invalid reading" });
-    }
+    const amount = (units * rate_per_unit) + fixed_charge;
 
-    // 4. Tariff logic (simple slab)
-    let amount = 0;
-
-    if (units <= 100) {
-      amount = units * 3;
-    } else if (units <= 200) {
-      amount = (100 * 3) + (units - 100) * 5;
-    } else {
-      amount = (100 * 3) + (100 * 5) + (units - 200) * 7;
-    }
-
-    // 5. Fixed charge
-    const fixed_charge = consumer.connection_type === "commercial" ? 150 : 50;
-
-    const total_amount = amount + fixed_charge;
-
-    // 6. Save reading
     await db.execute(
-      "INSERT INTO meter_readings (bp_no, reading_value, previous_reading, unit_consumed) VALUES (?, ?, ?, ?)",
-      [bp_no,  reading_value, previous_reading, units]
-    );
-
-    // 7. Save bill
-    await db.execute(
-      "INSERT INTO bills (bp_no, total_unit, amount, fixed_charge, total_amount) VALUES (?, ?, ?, ?, ?)",
-      [bp_no, units, total_amount, fixed_charge, total_amount]
+      "INSERT INTO bills(reading_id, amount) VALUES(?, ?)",
+      [reading_id, amount]
     );
 
     res.status(200).json({
-      message: "Bill generated successfully",
-      data: {
-        bp_no,
-        previous_reading,
-        reading_value,
-        units,
-        amount,
-        fixed_charge,
-        total_amount,
-      },
+      success: true,
+      message: "Bill calculated",
+      amount:amount
     });
 
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error" });
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
   }
 };
 

@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
 
-const { generateBill } = require("../controllers/billController");
+const {setBilling } = require("../controllers/billController");
 
-router.get("/generate/:id", generateBill);
+router.get("/bill/:reading_id", setBilling);
 
 module.exports = router;
 
