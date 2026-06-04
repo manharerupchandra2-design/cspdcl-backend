@@ -167,7 +167,7 @@ exports.setReading = async (req, res) => {
         message: "current reading problem"
       })
     }
-    console.log(id);
+    console.log(consumer_id);
     const units = current_reading - pre_reading;
 
       const sql2=`insert into meter_readings
