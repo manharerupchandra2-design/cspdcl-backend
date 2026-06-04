@@ -137,3 +137,58 @@ consumer_id=? order by mr.reading_date desc limit 1
     res.status(500).json({ error: error.message });
   }
 };
+
+
+exports.setReading = async (req, res) => {
+  try {
+
+    const { consumer_id } = req.params;
+    const {
+      meter_id,
+      reader_id,
+      current_reading,
+      meter_photo
+    }=req.body;
+
+    const sql1=`select current_reading from meter_readings 
+                where consumer_id=? 
+                order by id desc limit 1`;
+    const [row1]=await db.query(sql1,[consumer_id]);
+
+    
+    if(row1.length>0){
+      const pre_reading=row1[0].current_reading;
+    }
+    
+    if(current_reading<pre_reading)
+    {
+      return res.status(400).json({
+        success: false,
+        message: "current reading problem"
+      })
+    }
+    console.log(id);
+    const units = current_reading - pre_reading;
+
+      const sql2=`insert into meter_readings
+      (consumer_id,
+      meter_id,
+      reader_id,
+      previous_reading,
+      current_reading,
+      units,
+      meter_photo)
+      values(?,?,?,?,?,?,?)`;
+
+      await db.execute(sql2,[consumer_id,meter_id,reader_id,pre_reading,current_reading,units,meter_photo
+      ]);
+    res.status(200).json({
+      success: true,
+      message: "Reading submitted",
+    });
+
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ error: error.message });
+  }
+};
