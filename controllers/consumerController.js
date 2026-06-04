@@ -155,9 +155,9 @@ exports.setReading = async (req, res) => {
                 order by id desc limit 1`;
     const [row1]=await db.query(sql1,[consumer_id]);
 
-    
+    let pre_reading=0;
     if(row1.length>0){
-      const pre_reading=row1[0].current_reading;
+       pre_reading=row1[0].current_reading;
     }
     
     if(current_reading<pre_reading)
