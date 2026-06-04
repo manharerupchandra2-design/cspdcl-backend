@@ -23,23 +23,26 @@ const db = require("../config/db");
 // Get All Consumers
 exports.getAllConsumers = async (req, res) => {
   try {
-    const [rows] = await db.execute("select consumers.*,meters.meter_no,meters.meter_type from consumers left join  meters on consumers.id=meters.consumer_id");
-    const [total_consumers]= await db.execute("select count(*) as total_consumers from consumers");
+    const [rows] = await db.execute(`select consumers.*,
+      meters.meter_no,meters.meter_type from consumers
+      left join  meters on consumers.id=meters.consumer_id`);
+    const [total_consumers] = await db.execute(`select count(*) as 
+      total_consumers from consumers`);
 
     if (rows.length === 0) {
-  return res.status(200).json({
-    success: true,
-    message: "Empty"
-  });
-}
+      return res.status(200).json({
+        success: true,
+        message: "Empty"
+      });
+    }
     res.status(200).json({
-      success:true,
-      message:"Fetched all consumer successfully",
-      data:{
-        consumers:rows,
-        total_consumers:total_consumers[0].total_consumers
+      success: true,
+      message: "Fetched all consumer successfully",
+      data: {
+        consumers: rows,
+        total_consumers: total_consumers[0].total_consumers
       }
-      
+
     });
 
   } catch (error) {
@@ -83,31 +86,54 @@ exports.getSingleConsumer = async (req, res) => {
 // };
 
 
+// exports.getConsumersPreviousBill = async (req, res) => {
+//   try {
+
+//     const { id } = req.params;
+//     console.log(id);
+//     const [rows] = await db.query(`
+// select c.name,c.consumer_no,c.mobile,c.address , 
+// m.meter_no,m.meter_type, 
+// mr.previous_reading,mr.current_reading,mr.units,
+// b.amount
+// from consumers c 
+// left join meters m
+// on c.id=m.consumer_id 
+// left join meter_readings mr on c.id=mr.consumer_id 
+// left join bills b on
+// mr.id=b.reading_id where c.id=? order by mr.reading_date desc limit 1;
+// `, [id]);
+//     res.status(200).json({
+//       success: true,
+//       message: "Got it",
+//       data: rows
+//     });
+
+//   } catch (error) {
+//     console.log(error)
+//     res.status(500).json({ error: error.message });
+//   }
+// };
+
 exports.getConsumersPreviousBill = async (req, res) => {
   try {
 
-    const {id}=req.params;
-console.log(id);
+    const { id } = req.params;
+    console.log(id);
     const [rows] = await db.query(`
-select c.name,c.consumer_no,c.mobile,c.address , 
-m.meter_no,m.meter_type, 
-mr.previous_reading,mr.current_reading,mr.units,
-b.amount
-from consumers c 
-left join meters m
-on c.id=m.consumer_id 
-left join meter_readings mr on c.id=mr.consumer_id 
-left join bills b on
-mr.id=b.reading_id where c.id=? order by mr.reading_date desc limit 1;
-`,[id]);
+select mr.current_reading, b.amount from meter_readings mr 
+left join 
+bills b on mr.id=b.reading_id where 
+consumer_id=? order by mr.reading_date desc limit 1
+`, [id]);
     res.status(200).json({
-      success:true,
-      message:"Got it",
-      data:rows});
+      success: true,
+      message: "Got it",
+      data: rows
+    });
 
   } catch (error) {
     console.log(error)
     res.status(500).json({ error: error.message });
   }
 };
-
