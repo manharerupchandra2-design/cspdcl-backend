@@ -148,20 +148,19 @@ exports.setReading = async (req, res) => {
       reader_id,
       current_reading,
       meter_photo
-    }=req.body;
+    } = req.body;
 
-    const sql1=`select current_reading from meter_readings 
+    const sql1 = `select current_reading from meter_readings 
                 where consumer_id=? 
                 order by id desc limit 1`;
-    const [row1]=await db.query(sql1,[consumer_id]);
+    const [row1] = await db.query(sql1, [consumer_id]);
 
-    let pre_reading=0;
-    if(row1.length>0){
-       pre_reading=row1[0].current_reading;
+    let pre_reading = 0;
+    if (row1.length > 0) {
+      pre_reading = row1[0].current_reading;
     }
-    
-    if(current_reading<pre_reading)
-    {
+
+    if (current_reading < pre_reading) {
       return res.status(400).json({
         success: false,
         message: "current reading problem"
@@ -170,7 +169,7 @@ exports.setReading = async (req, res) => {
     console.log(consumer_id);
     const units = current_reading - pre_reading;
 
-      const sql2=`insert into meter_readings
+    const sql2 = `insert into meter_readings
       (consumer_id,
       meter_id,
       reader_id,
@@ -180,11 +179,12 @@ exports.setReading = async (req, res) => {
       meter_photo)
       values(?,?,?,?,?,?,?)`;
 
-      await db.execute(sql2,[consumer_id,meter_id,reader_id,pre_reading,current_reading,units,meter_photo
-      ]);
+    const [result] = await db.execute(sql2, [consumer_id, meter_id, reader_id, pre_reading, current_reading, units, meter_photo
+    ]);
     res.status(200).json({
       success: true,
       message: "Reading submitted",
+      reading_id: result.reading_id
     });
 
   } catch (error) {
@@ -192,3 +192,15 @@ exports.setReading = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.setBilling = async (req, res) => {
+  try {
+
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({
+      success: false,
+      error: error.message
+    })
+  }
+}
