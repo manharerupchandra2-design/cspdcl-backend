@@ -3,7 +3,8 @@ const calculateEnergyCharge = require("../utils/calculateBill");
 
 exports.setBilling = async (req, res) => {
   try {
-    const { reading_id, category } = req.params;
+    const { reading_id} = req.params;
+    const {category}=req.body;
 
     const [row1] = await db.execute(
       "SELECT units FROM meter_readings WHERE id=?",
