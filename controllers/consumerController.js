@@ -121,7 +121,7 @@ exports.getConsumersPreviousBill = async (req, res) => {
     const { id } = req.params;
     console.log(id);
     const [rows] = await db.query(`
-select mr.current_reading, b.amount from meter_readings mr 
+select mr.current_reading,mr.units,b.amount from meter_readings mr 
 left join 
 bills b on mr.id=b.reading_id where 
 consumer_id=? order by mr.reading_date desc limit 1
