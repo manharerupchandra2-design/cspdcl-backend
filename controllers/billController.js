@@ -44,11 +44,13 @@ exports.setBilling = async (req, res) => {
       "INSERT INTO bills(reading_id, amount) VALUES(?, ?)",
       [reading_id, amount]
     );
-
+    console.log(amount)
+    console.log(fixed_charge)
     res.status(200).json({
       success: true,
       message: "Bill calculated",
-      amount:amount
+      amount:amount,
+      fixed_charge:fixed_charge
     });
 
   } catch (error) {
