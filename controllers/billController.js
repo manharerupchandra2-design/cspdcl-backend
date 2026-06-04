@@ -36,7 +36,7 @@ exports.setBilling = async (req, res) => {
     }
 
     const rate_per_unit = row2[0].rate_per_unit;
-    const fixed_charge = row2[0].fixed_charge;
+    const fixed_charge = parseFloat(row2[0].fixed_charge);
 
     const amount = (units * rate_per_unit) + fixed_charge;
 
