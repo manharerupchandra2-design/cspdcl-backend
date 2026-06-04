@@ -129,7 +129,7 @@ consumer_id=? order by mr.reading_date desc limit 1
     res.status(200).json({
       success: true,
       message: "Got it",
-      data: rows
+      data: rows[0]
     });
 
   } catch (error) {
