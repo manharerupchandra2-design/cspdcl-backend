@@ -270,3 +270,83 @@ exports.getConsumers = async (req, res) => {
     });
   }
 };
+
+exports.getConsumerDetail = async (req, res) => {
+  try {
+
+    const { consumer_id } = req.params;
+
+    const sql1 = `
+      SELECT
+      c.id,
+      c.consumer_no,
+      c.name,
+      c.mobile,
+      c.address,
+
+      m.id AS meter_id,
+      m.meter_no,
+      m.meter_type
+
+      FROM consumers c
+
+      LEFT JOIN meters m
+      ON c.id = m.consumer_id
+
+      WHERE c.id = ?
+    `;
+
+    const [consumerRow] =
+      await db.execute(sql1, [consumer_id]);
+
+    if (consumerRow.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Consumer not found"
+      });
+    }
+
+    const sql2 = `
+      SELECT
+      mr.previous_reading,
+      mr.current_reading,
+      mr.units,
+      b.amount
+
+      FROM meter_readings mr
+
+      LEFT JOIN bills b
+      ON mr.id = b.reading_id
+
+      WHERE mr.consumer_id = ?
+
+      ORDER BY mr.id DESC
+      LIMIT 1
+    `;
+
+    const [billRow] =
+      await db.execute(sql2, [consumer_id]);
+
+    res.status(200).json({
+      success: true,
+      message: "Consumer detail fetched",
+      data: {
+        consumer: consumerRow[0],
+
+        previous_bill:
+          billRow.length > 0
+            ? billRow[0]
+            : null
+      }
+    });
+
+  } catch (error) {
+
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+};
