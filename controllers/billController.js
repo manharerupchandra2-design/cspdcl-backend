@@ -50,7 +50,6 @@ exports.setBilling = async (req, res) => {
       success: true,
       message: "Bill calculated",
       amount:amount,
-      fixed_charge:fixed_charge
     });
 
   } catch (error) {
