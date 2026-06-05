@@ -8,7 +8,7 @@ exports.meterreaderLogin = async (req, res) => {
 
     console.log(req.body);
     const { email, password } = req.body;
-    if(!email?.trim()||!password.trim()){
+    if (!email?.trim() || !password.trim()) {
       return res.status(400).json({
         success: false,
         message: "All fields are required"
@@ -26,7 +26,7 @@ exports.meterreaderLogin = async (req, res) => {
     }
 
     const user = row[0];
-    
+
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
@@ -34,7 +34,7 @@ exports.meterreaderLogin = async (req, res) => {
         success: false,
         message: "Incorrect Password"
       });
-      
+
     }
 
     const token = jwt.sign({
@@ -43,19 +43,20 @@ exports.meterreaderLogin = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "7d" });
 
-   return res.json({
+    return res.json({
       success: true,
       message: "Login successfull",
       token,
       user: {
         id: user.id,
         name: user.name,
-        email: user.email
+        email: user.email,
+        mobile: user.mobile
       }
     });
   } catch (error) {
     console.log(error)
-    res.status(500).json({ success: false, message: "Server error",});
+    res.status(500).json({ success: false, message: "Server error", });
   }
 };
 
@@ -63,7 +64,7 @@ exports.meterreaderSignup = async (req, res) => {
   try {
 
     const { name, mobile, email, password } = req.body;
-    if(!name?.trim()||!mobile?.trim()||!email?.trim()||!password?.trim()){
+    if (!name?.trim() || !mobile?.trim() || !email?.trim() || !password?.trim()) {
       return res.status(400).json({
         success: false,
         message: "All fields are required"
