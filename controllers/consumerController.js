@@ -21,72 +21,101 @@ const db = require("../config/db");
 // };
 
 // Get All Consumers
-exports.getAllConsumers = async (req, res) => {
-  try {
-    const [rows] = await db.execute(`select consumers.*,
-      meters.meter_no,
-      meters.meter_type,
-      meters.id as meter_id
-      from consumers left join  meters on consumers.id=meters.consumer_id`);
-    const [total_consumers] = await db.execute(`select count(*) as 
-      total_consumers from consumers`);
-
-    if (rows.length === 0) {
-      return res.status(200).json({
-        success: true,
-        message: "Empty"
-      });
-    }
-    res.status(200).json({
-      success: true,
-      message: "Fetched all consumer successfully",
-      data: {
-        consumers: rows,
-        total_consumers: total_consumers[0].total_consumers
-      }
-
-    });
-
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-// Get Single Consumer
-exports.getSingleConsumer = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const [rows] = await db.execute(
-      "SELECT * FROM consumers WHERE id = ?",
-      [id]
-    );
-
-    res.json(rows[0]);
-
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-// exports.removeConsumer = async (req, res) => {
+// exports.getAllConsumers = async (req, res) => {
 //   try {
-//     const id = req.params.id;
+//     const [rows] = await db.execute(`select consumers.*,
+//       meters.meter_no,
+//       meters.meter_type,
+//       meters.id as meter_id
+//       from consumers left join  meters on consumers.id=meters.consumer_id`);
+//     const [total_consumers] = await db.execute(`select count(*) as 
+//       total_consumers from consumers`);
 
-//     const result=await db.query(
-//       "delete from consumers where id=? ",
-//       [id]
-//     );
+//     if (rows.length === 0) {
+//       return res.status(200).json({
+//         success: true,
+//         message: "Empty"
+//       });
+//     }
+//     res.status(200).json({
+//       success: true,
+//       message: "Fetched all consumer successfully",
+//       data: {
+//         consumers: rows,
+//         total_consumers: total_consumers[0].total_consumers
+//       }
 
-//     res.json({result,
-//       message:"Deleted"});
+//     });
 
 //   } catch (error) {
 //     res.status(500).json({ error: error.message });
-//     console.log(req.params.id);
 //   }
 // };
 
+// // Get Single Consumer
+// exports.getSingleConsumer = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+
+//     const [rows] = await db.execute(
+//       "SELECT * FROM consumers WHERE id = ?",
+//       [id]
+//     );
+
+//     res.json(rows[0]);
+
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
+
+// // exports.removeConsumer = async (req, res) => {
+// //   try {
+// //     const id = req.params.id;
+
+// //     const result=await db.query(
+// //       "delete from consumers where id=? ",
+// //       [id]
+// //     );
+
+// //     res.json({result,
+// //       message:"Deleted"});
+
+// //   } catch (error) {
+// //     res.status(500).json({ error: error.message });
+// //     console.log(req.params.id);
+// //   }
+// // };
+
+
+// // exports.getConsumersPreviousBill = async (req, res) => {
+// //   try {
+
+// //     const { id } = req.params;
+// //     console.log(id);
+// //     const [rows] = await db.query(`
+// // select c.name,c.consumer_no,c.mobile,c.address , 
+// // m.meter_no,m.meter_type, 
+// // mr.previous_reading,mr.current_reading,mr.units,
+// // b.amount
+// // from consumers c 
+// // left join meters m
+// // on c.id=m.consumer_id 
+// // left join meter_readings mr on c.id=mr.consumer_id 
+// // left join bills b on
+// // mr.id=b.reading_id where c.id=? order by mr.reading_date desc limit 1;
+// // `, [id]);
+// //     res.status(200).json({
+// //       success: true,
+// //       message: "Got it",
+// //       data: rows
+// //     });
+
+// //   } catch (error) {
+// //     console.log(error)
+// //     res.status(500).json({ error: error.message });
+// //   }
+// // };
 
 // exports.getConsumersPreviousBill = async (req, res) => {
 //   try {
@@ -94,21 +123,15 @@ exports.getSingleConsumer = async (req, res) => {
 //     const { id } = req.params;
 //     console.log(id);
 //     const [rows] = await db.query(`
-// select c.name,c.consumer_no,c.mobile,c.address , 
-// m.meter_no,m.meter_type, 
-// mr.previous_reading,mr.current_reading,mr.units,
-// b.amount
-// from consumers c 
-// left join meters m
-// on c.id=m.consumer_id 
-// left join meter_readings mr on c.id=mr.consumer_id 
-// left join bills b on
-// mr.id=b.reading_id where c.id=? order by mr.reading_date desc limit 1;
+// select mr.current_reading,mr.units,b.amount from meter_readings mr 
+// left join 
+// bills b on mr.id=b.reading_id where 
+// consumer_id=? order by mr.reading_date desc limit 1
 // `, [id]);
 //     res.status(200).json({
 //       success: true,
 //       message: "Got it",
-//       data: rows
+//       data: rows[0]
 //     });
 
 //   } catch (error) {
@@ -117,107 +140,130 @@ exports.getSingleConsumer = async (req, res) => {
 //   }
 // };
 
-exports.getConsumersPreviousBill = async (req, res) => {
+
+// exports.setReading = async (req, res) => {
+//   try {
+
+//     const { consumer_id } = req.params;
+//     const {
+//       meter_id,
+//       reader_id,
+//       current_reading,
+//       meter_photo
+//     } = req.body;
+
+//     const sql1 = `select current_reading from meter_readings 
+//                 where consumer_id=? 
+//                 order by id desc limit 1`;
+//     const [row1] = await db.query(sql1, [consumer_id]);
+
+//     let pre_reading = 0;
+//     if (row1.length > 0) {
+//       pre_reading = row1[0].current_reading;
+//     }
+
+//     if (current_reading < pre_reading) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "current reading problem"
+//       })
+//     }
+//     console.log(consumer_id);
+//     const units = current_reading - pre_reading;
+
+//     const sql2 = `insert into meter_readings
+//       (consumer_id,
+//       meter_id,
+//       reader_id,
+//       previous_reading,
+//       current_reading,
+//       units,
+//       meter_photo)
+//       values(?,?,?,?,?,?,?)`;
+
+//     const [result] = await db.execute(sql2, [consumer_id, meter_id, reader_id, pre_reading, current_reading, units, meter_photo
+//     ]);
+//     res.status(200).json({
+//       success: true,
+//       message: "Reading submitted",
+//       reading_id: result.insertId
+//     });
+
+//   } catch (error) {
+//     console.log(error)
+//     res.status(500).json({ error: error.message });
+//   }
+// };
+
+
+// exports.getDashboard = async (req, res) => {
+//   try {
+
+//     const [consumer] =
+//         await db.execute("SELECT COUNT(*) total FROM consumers");
+
+//     const [reading] =
+//         await db.execute("SELECT COUNT(*) total FROM meter_readings");
+
+//     const [bill] =
+//         await db.execute("SELECT COUNT(*) total FROM bills");
+
+//     res.status(200).json({
+//       success: true,
+//       data: {
+//         total_consumers: consumer[0].total,
+//         total_readings: reading[0].total,
+//         total_bills: bill[0].total
+//       }
+//     });
+
+//   } catch (error) {
+//     res.status(500).json({
+//       success: false,
+//       error: error.message
+//     });
+//   }
+// };
+
+
+
+exports.getConsumers = async (req, res) => {
   try {
 
-    const { id } = req.params;
-    console.log(id);
-    const [rows] = await db.query(`
-select mr.current_reading,mr.units,b.amount from meter_readings mr 
-left join 
-bills b on mr.id=b.reading_id where 
-consumer_id=? order by mr.reading_date desc limit 1
-`, [id]);
-    res.status(200).json({
-      success: true,
-      message: "Got it",
-      data: rows[0]
-    });
+    const sql = `
+      SELECT
+      c.id,
+      c.consumer_no,
+      c.name,
+      c.mobile,
+      c.address,
 
-  } catch (error) {
-    console.log(error)
-    res.status(500).json({ error: error.message });
-  }
-};
+      m.id AS meter_id,
+      m.meter_no,
+      m.meter_type
 
+      FROM consumers c
 
-exports.setReading = async (req, res) => {
-  try {
+      LEFT JOIN meters m
+      ON c.id = m.consumer_id
 
-    const { consumer_id } = req.params;
-    const {
-      meter_id,
-      reader_id,
-      current_reading,
-      meter_photo
-    } = req.body;
+      ORDER BY c.id DESC
+    `;
 
-    const sql1 = `select current_reading from meter_readings 
-                where consumer_id=? 
-                order by id desc limit 1`;
-    const [row1] = await db.query(sql1, [consumer_id]);
-
-    let pre_reading = 0;
-    if (row1.length > 0) {
-      pre_reading = row1[0].current_reading;
-    }
-
-    if (current_reading < pre_reading) {
-      return res.status(400).json({
-        success: false,
-        message: "current reading problem"
-      })
-    }
-    console.log(consumer_id);
-    const units = current_reading - pre_reading;
-
-    const sql2 = `insert into meter_readings
-      (consumer_id,
-      meter_id,
-      reader_id,
-      previous_reading,
-      current_reading,
-      units,
-      meter_photo)
-      values(?,?,?,?,?,?,?)`;
-
-    const [result] = await db.execute(sql2, [consumer_id, meter_id, reader_id, pre_reading, current_reading, units, meter_photo
-    ]);
-    res.status(200).json({
-      success: true,
-      message: "Reading submitted",
-      reading_id: result.insertId
-    });
-
-  } catch (error) {
-    console.log(error)
-    res.status(500).json({ error: error.message });
-  }
-};
-
-
-exports.getDashboard = async (req, res) => {
-  try {
-
-    const [consumer] =
-        await db.execute("SELECT COUNT(*) total FROM consumers");
-
-    const [reading] =
-        await db.execute("SELECT COUNT(*) total FROM meter_readings");
-
-    const [bill] =
-        await db.execute("SELECT COUNT(*) total FROM bills");
+    const [rows] = await db.execute(sql);
 
     res.status(200).json({
       success: true,
+      message: "Fetched all consumers successfully",
       data: {
-        total_consumers: consumer[0].total,
-        total_readings: reading[0].total,
-        total_bills: bill[0].total
+        total_consumers: rows.length,
+        consumers: rows
       }
     });
 
   } catch (error) {
+    console.log(error);
+
     res.status(500).json({
       success: false,
       error: error.message
