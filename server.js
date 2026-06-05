@@ -8,7 +8,7 @@ const readingRoutes = require("./routes/readingRoutes");
 const billRoutes = require("./routes/billRoutes");
 const meterRoutes=require("./routes/meterRoutes");
 const meterreaderRoutes=require("./routes/meterreaderRoutes")
-const dashboardRoutes=require("./controllers/dashboardController")
+const dashboardRoutes=require("./routes/dashboardRoutes")
 
 const app = express();
 
