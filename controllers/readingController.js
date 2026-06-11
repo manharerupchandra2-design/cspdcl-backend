@@ -113,21 +113,20 @@ const upload = require('../middleware/upload');
 
 exports.setReading = async (req, res) => {
   try {
-     
-   console.log('BODY:', req.body);
-  console.log('FILE:', req.file);
-  console.log('PARAMS:', req.params);
+
+    console.log('BODY:', JSON.stringify(req.body));
+    console.log('FILE:', JSON.stringify(req.file));
     const { consumerId } = req.params;
 
     const {
       meter_id,
       reader_id,
       current_reading,
-      
+
     } = req.body;
     const meter_photo = req.file
-  ? req.file.path
-  : null;
+      ? req.file.path
+      : null;
     if (
       !meter_id ||
       !reader_id ||
@@ -267,7 +266,7 @@ exports.editReading = async (req, res) => {
     const sql = "update meter_readings set current_reading=?,units=? where id=?";
 
     await db.execute(sql, [current_reading, unitsConsumed, reading_id])
-  
+
 
     return res.status(200).json({
       success: true,
