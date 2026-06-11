@@ -124,7 +124,7 @@ exports.setReading = async (req, res) => {
       
     } = req.body;
     const meter_photo = req.file
-  ? `${req.protocol}://${req.get('host')}/api/uploads/${req.file.filename}`
+  ? req.file.path
   : null;
     if (
       !meter_id ||

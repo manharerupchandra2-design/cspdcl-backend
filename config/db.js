@@ -2,20 +2,20 @@
 require("dotenv").config();
 const mysql = require("mysql2/promise");
 
-// const db = mysql.createPool(
-//  process.env.MYSQL_URL
-// );
+const db = mysql.createPool(
+ process.env.MYSQL_URL
+);
 
 
-// console.log("MYSQL URL =", process.env.MYSQL_URL);
+console.log("MYSQL URL =", process.env.MYSQL_URL);
 
 
-const db=mysql.createPool({
-  host:"localhost",
-  user:"root",
-  password:"Rup1432@",
-  database:"cspdcl_database"
-})
+// const db=mysql.createPool({
+//   host:"localhost",
+//   user:"root",
+//   password:"Rup1432@",
+//   database:"cspdcl_database"
+// })
 
 async function checkDB() {
   try {
