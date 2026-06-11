@@ -33,6 +33,28 @@
 // const upload = multer({ storage, fileFilter }); // ✅ variable me store karo
 // module.exports = upload;                         // ✅ phir export karo
 
+// const cloudinary = require('cloudinary').v2;
+// const { CloudinaryStorage } = require('multer-storage-cloudinary');
+// const multer = require('multer');
+
+// cloudinary.config({
+//   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+//   api_key:    process.env.CLOUDINARY_API_KEY,
+//   api_secret: process.env.CLOUDINARY_API_SECRET,
+// });
+
+// const storage = new CloudinaryStorage({
+//   cloudinary,
+//   params: {
+//     folder: 'meter_readings',   // Cloudinary me folder
+//     allowed_formats: ['jpg', 'jpeg', 'png', 'heic'],
+//     transformation: [{ quality: 'auto' }], // auto compress
+//   },
+// });
+
+// const upload = multer({ storage });
+// module.exports = upload;
+
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const multer = require('multer');
@@ -43,12 +65,18 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+// ✅ Ye add karo — credentials print honge Render logs me
+console.log('Cloudinary config:', {
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key:    process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET ? '✅ set' : '❌ missing',
+});
+
 const storage = new CloudinaryStorage({
   cloudinary,
   params: {
-    folder: 'meter_readings',   // Cloudinary me folder
+    folder: 'meter_readings',
     allowed_formats: ['jpg', 'jpeg', 'png', 'heic'],
-    transformation: [{ quality: 'auto' }], // auto compress
   },
 });
 
