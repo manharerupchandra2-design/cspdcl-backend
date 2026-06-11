@@ -113,8 +113,10 @@ const upload = require('../middleware/upload');
 
 exports.setReading = async (req, res) => {
   try {
-      console.log('BODY:', req.body);
-  console.log('FILE:', req.file);  
+     
+   console.log('BODY:', req.body);
+  console.log('FILE:', req.file);
+  console.log('PARAMS:', req.params);
     const { consumerId } = req.params;
 
     const {
