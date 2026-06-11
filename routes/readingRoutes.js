@@ -1,24 +1,16 @@
-// const express = require("express");
-// const router = express.Router();
 
-// const {
-//   addReading,
-//   getReadingsByConsumer
-// } = require("../controllers/readingController");
-
-// router.post("/", addReading);
-// router.get("/:consumerId", getReadingsByConsumer);
-
-// module.exports = router;
 
 const express = require("express");
+const upload = require('../middleware/upload');
 
 const router = express.Router();
-
+const { verifyToken } = require("../middleware/authMiddleware");
 const {
-  addReading
+  setReading, getReadingHistory, editReading
 } = require("../controllers/readingController");
 
-router.post("/", addReading);
+router.post("/:consumerId", upload.single('meter_photo'), setReading);
+router.get("/history", getReadingHistory)
+router.put("/editReading/:reading_id", editReading)
 
 module.exports = router;
