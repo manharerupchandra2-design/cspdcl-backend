@@ -238,46 +238,46 @@ exports.getReadingHistory = async (req, res) => {
 };
 
 // exports.editReading = async (req, res) => {
-  try {
-    const { reading_id } = req.params
-    const { current_reading } = req.body;
-    const [previousBill] = await db.query(
-      `SELECT previous_reading
-       FROM meter_readings
-       WHERE id = ?`,
-      [reading_id]
-    );
+  // try {
+  //   const { reading_id } = req.params
+  //   const { current_reading } = req.body;
+  //   const [previousBill] = await db.query(
+  //     `SELECT previous_reading
+  //      FROM meter_readings
+  //      WHERE id = ?`,
+  //     [reading_id]
+  //   );
 
-    const previousReading =
-      previousBill.length > 0
-        ? previousBill[0].previous_reading
-        : 0;
+  //   const previousReading =
+  //     previousBill.length > 0
+  //       ? previousBill[0].previous_reading
+  //       : 0;
 
-    const unitsConsumed =
-      current_reading - previousReading;
+  //   const unitsConsumed =
+  //     current_reading - previousReading;
 
-    if (unitsConsumed < 0) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Current reading cannot be less than previous reading",
-      });
-    }
-    const sql = "update meter_readings set current_reading=?,units=? where id=?";
+  //   if (unitsConsumed < 0) {
+  //     return res.status(400).json({
+  //       success: false,
+  //       message:
+  //         "Current reading cannot be less than previous reading",
+  //     });
+  //   }
+  //   const sql = "update meter_readings set current_reading=?,units=? where id=?";
 
-    await db.execute(sql, [current_reading, unitsConsumed, reading_id])
+  //   await db.execute(sql, [current_reading, unitsConsumed, reading_id])
 
 
-    return res.status(200).json({
-      success: true,
-      message:
-        "Reading submitted successfully",
-    });
+  //   return res.status(200).json({
+  //     success: true,
+  //     message:
+  //       "Reading submitted successfully",
+  //   });
 
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
+  // } catch (error) {
+  //   return res.status(500).json({
+  //     success: false,
+  //     message: error.message,
+  //   });
+  // }
 // }
