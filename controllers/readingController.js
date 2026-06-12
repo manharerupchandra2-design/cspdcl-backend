@@ -227,7 +227,7 @@ exports.getReadingHistory = async (req, res) => {
 
       ORDER BY mr.reading_date DESC
     `);
-
+console.log(rows[0])
     res.status(200).json({
       success: true,
       data: rows,
