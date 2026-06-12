@@ -113,7 +113,10 @@ const upload = require('../middleware/upload');
 
 exports.setReading = async (req, res) => {
   try {
-
+console.log('BODY type:', typeof req.body);
+console.log('BODY keys:', Object.keys(req.body || {}));
+console.log('FILE type:', typeof req.file);
+console.log('Content-Type:', req.headers['content-type']);
 console.log('BODY:', req.body);
 console.log('FILE:', req.file);
     const { consumerId } = req.params;
