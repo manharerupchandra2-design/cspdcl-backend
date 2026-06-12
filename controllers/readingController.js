@@ -114,8 +114,8 @@ const upload = require('../middleware/upload');
 exports.setReading = async (req, res) => {
   try {
 
-    console.log('BODY:', JSON.stringify(req.body));
-    console.log('FILE:', JSON.stringify(req.file));
+console.log('BODY:', req.body);
+console.log('FILE:', req.file);
     const { consumerId } = req.params;
 
     const {
@@ -237,7 +237,7 @@ exports.getReadingHistory = async (req, res) => {
   }
 };
 
-exports.editReading = async (req, res) => {
+// exports.editReading = async (req, res) => {
   try {
     const { reading_id } = req.params
     const { current_reading } = req.body;
@@ -280,4 +280,4 @@ exports.editReading = async (req, res) => {
       message: error.message,
     });
   }
-}
+// }
