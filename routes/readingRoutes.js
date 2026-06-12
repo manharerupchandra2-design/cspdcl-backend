@@ -10,7 +10,21 @@ const {
 } = require("../controllers/readingController");
 
 router.get("/history", getReadingHistory)
-router.post("/:consumerId", upload.single('meter_photo'), setReading);
+const uploadMiddleware = (req, res, next) => {
+  upload.single('meter_photo')(req, res, (err) => {
+    if (err) {
+      console.log('MULTER ERROR:', err.message);  // ← exact error dikhega
+      return res.status(500).json({ 
+        success: false, 
+        message: err.message 
+      });
+    }
+    next();
+  });
+};
+
+router.post("/:consumerId", uploadMiddleware, setReading);
+// router.post("/:consumerId", upload.single('meter_photo'), setReading);
 
 // router.put("/editReading/:reading_id", editReading)
 
