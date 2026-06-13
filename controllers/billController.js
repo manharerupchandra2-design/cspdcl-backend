@@ -96,3 +96,34 @@ exports.setBilling = async (req, res) => {
     });
   }
 };
+exports.getBillHistory = async (req, res) => {
+  try {
+    const [rows] = await db.execute(`
+      SELECT
+        b.id AS bill_id,
+        b.amount,
+        b.created_at,
+        c.name AS consumer_name,
+        c.consumer_no,
+        m.meter_no,
+        mr.previous_reading,
+        mr.current_reading,
+        mr.units
+      FROM bills b
+      JOIN meter_readings mr ON mr.id = b.reading_id
+      JOIN consumers c ON c.id = mr.consumer_id
+      JOIN meters m ON m.id = mr.meter_id
+      ORDER BY b.created_at DESC
+    `);
+
+    res.status(200).json({
+      success: true,
+      data: rows,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
