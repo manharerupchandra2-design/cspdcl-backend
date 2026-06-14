@@ -5,8 +5,8 @@ const {verifyToken} = require("../middleware/authMiddleware")
 const {getBillHistory, setBilling  } = require("../controllers/billController");
 
 
-router.get("/history", getBillHistory);
-router.post("/:reading_id", setBilling);
+router.get("/history", verifyToken,getBillHistory);
+router.post("/:reading_id", verifyToken,setBilling);
 
 
 module.exports = router;
