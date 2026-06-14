@@ -98,11 +98,19 @@ exports.setBilling = async (req, res) => {
 };
 exports.getBillHistory = async (req, res) => {
   try {
+    const readerId = req.user.id; // ← token se
+
+    const [readerRow] = await db.execute(
+      'SELECT zone FROM meter_readers WHERE id = ?',
+      [readerId]
+    );
+
+    const readerZone = readerRow[0].zone;
+
     const [rows] = await db.execute(`
       SELECT
         b.id AS bill_id,
         b.amount,
-        b.created_at,
         c.name AS consumer_name,
         c.consumer_no,
         m.meter_no,
@@ -113,8 +121,9 @@ exports.getBillHistory = async (req, res) => {
       JOIN meter_readings mr ON mr.id = b.reading_id
       JOIN consumers c ON c.id = mr.consumer_id
       JOIN meters m ON m.id = mr.meter_id
+      WHERE c.zone = ?
       ORDER BY b.created_at DESC
-    `);
+    `, [readerZone]); // ← zone filter
 
     res.status(200).json({
       success: true,
@@ -127,3 +136,4 @@ exports.getBillHistory = async (req, res) => {
     });
   }
 };
+
