@@ -13,7 +13,8 @@ const {
 } = require("../controllers/consumerController");
 
 // router.post("/reading/:consumer_id", setReading);
-router.get("/", getConsumers);
+// consumerRoutes.js
+router.get("/", verifyToken, getConsumers);  // ← verifyToken add karo
 router.get("/:consumer_id", getConsumerDetail);
 // router.get("/getConsumersPreviousBill/:id", getConsumersPreviousBill);
 // router.get("/:id", getSingleConsumer);

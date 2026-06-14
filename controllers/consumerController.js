@@ -3,32 +3,45 @@ const db = require("../config/db");
 
 exports.getConsumers = async (req, res) => {
   try {
+    // Token se reader id lo
+    const readerId = req.user.id;
+
+    // Pehle reader ka zone nikalo
+    const [readerRow] = await db.execute(
+      'SELECT zone FROM meter_readers WHERE id = ?',
+      [readerId]
+    );
+
+    if (readerRow.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Reader not found"
+      });
+    }
+
+    const readerZone = readerRow[0].zone;
 
     const sql = `
       SELECT
-      c.id,
-      c.consumer_no,
-      c.name,
-      c.mobile,
-      c.address,
-
-      m.id AS meter_id,
-      m.meter_no,
-      m.meter_type
-
+        c.id,
+        c.consumer_no,
+        c.name,
+        c.mobile,
+        c.address,
+        m.id AS meter_id,
+        m.meter_no,
+        m.meter_type
       FROM consumers c
-
-      LEFT JOIN meters m
-      ON c.id = m.consumer_id
-
+      LEFT JOIN meters m ON c.id = m.consumer_id
+      WHERE c.zone = ?          
       ORDER BY c.id DESC
     `;
 
-    const [rows] = await db.execute(sql);
+    const [rows] = await db.execute(sql, [readerZone]);
 
     res.status(200).json({
       success: true,
-      message: "Fetched all consumers successfully",
+      message: "Fetched consumers successfully",
       data: {
         total_consumers: rows.length,
         consumers: rows
@@ -37,7 +50,6 @@ exports.getConsumers = async (req, res) => {
 
   } catch (error) {
     console.log(error);
-
     res.status(500).json({
       success: false,
       error: error.message
