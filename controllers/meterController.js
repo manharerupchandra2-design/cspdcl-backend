@@ -1,73 +1,18 @@
-const db=require('../config/db');
+const db = require('../config/db');
 
-exports.getMeters = async (req,res)=>{
-    
-    try{
-        const [result]=await db.query("Select * from meters");
+exports.getMeters = async (req, res) => {
+
+    try {
+        const [result] = await db.query("Select * from meters");
         res.json(result);
-    }catch(err)
-    {
+    } catch (err) {
         res.status(500).json(err);
     }
 };
 
-exports.addMeter =async (req,res)=>{
-try{
-    const {bp_no,meter_no,meter_type,installed_date} = req.body;
-
-    const sql = "INSERT INTO meters(bp_no,meter_no,meter_type,installed_date) VALUES(?,?,?,?)";
-
-    await db.query(sql,[bp_no,meter_no,meter_type,installed_date]);
-   
-            res.json({message:"Meter Added"});
-        }
-
-    catch(err){
-             res.status(500).json(err);
-    }
-
-};
-
-exports.updateMeter =async (req,res)=>{
-try{
-    const id = req.params.id;
-    const {status} = req.body;
-
-   await db.query("UPDATE meters SET status=? WHERE id=?",[status,id])
-
-       
-       
-            res.json({message:"Meter Updated"});
-        }
- catch(err){
-            res.status(500).json(err);
-        }
-  
-
-};
-
-exports.deleteMeter = async (req,res)=>{
-
-    try{
-        const id = req.params.id;
-
-        await db.query("DELETE FROM meters WHERE id=?",[id]);
-
-            res.json({message:"Meter Deleted"});
-        }
-    catch(err){
-        res.status(500).json(err);
-    }
-
-
-
-};
-
-
-
-exports.getMeterWithConsumer = async (req,res)=>{
-try{
-    const sql = `
+exports.getMeterWithConsumer = async (req, res) => {
+    try {
+        const sql = `
     SELECT 
     consumers.id,
     consumers.name,
@@ -80,38 +25,30 @@ try{
     ON meters.consumer_id = consumers.id
     `;
 
-    const [result]=await db.query(sql);
-
-       
-        
-            res.json(result);
+        const [result] = await db.query(sql);
+        res.json(result);
     }
-        catch(err){
-            res.status(500).json(err);
-        }
-
-    
-
+    catch (err) {
+        res.status(500).json(err);
+    }
 };
 
-exports.getMeterByConsumer = async(req,res)=>{
-try{
-    const id = req.params.id;
+exports.getMeterByConsumer = async (req, res) => {
+    try {
+        const id = req.params.id;
 
-    const sql = `
+        const sql = `
     SELECT *
     FROM meters
     WHERE consumer_id=?
     `;
 
-  const [result]= await  db.query(sql,[id]);
-       
-       
-            res.json(result);
-        }
+        const [result] = await db.query(sql, [id]);
 
- catch(err){
-            res.status(500).json(err);
-        }
+        res.json(result);
+    }
+    catch (err) {
+        res.status(500).json(err);
+    }
 
 };

@@ -3,10 +3,9 @@ const db = require("../config/db");
 
 exports.getConsumers = async (req, res) => {
   try {
-    // Token se reader id lo
+    
     const readerId = req.user.id;
 
-    // Pehle reader ka zone nikalo
     const [readerRow] = await db.execute(
       'SELECT zone FROM meter_readers WHERE id = ?',
       [readerId]
