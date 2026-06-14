@@ -99,7 +99,9 @@ exports.setBilling = async (req, res) => {
 exports.getBillHistory = async (req, res) => {
   try {
     const readerId = req.user.id; // ← token se
-console.log('USER:', req.user);
+
+ console.log('USER:', req.user);        // ← add karo
+    console.log('HEADERS:', req.headers);  // ← add karo
     const [readerRow] = await db.execute(
       'SELECT zone FROM meter_readers WHERE id = ?',
       [readerId]
