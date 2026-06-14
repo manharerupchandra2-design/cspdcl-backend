@@ -106,9 +106,10 @@ exports.getBillHistory = async (req, res) => {
       'SELECT zone FROM meter_readers WHERE id = ?',
       [readerId]
     );
+     console.log('READER ROW:', readerRow);
 
     const readerZone = readerRow[0].zone;
-
+console.log('ZONE:', readerZone);
     const [rows] = await db.execute(`
       SELECT
     b.id AS bill_id,
@@ -133,6 +134,7 @@ exports.getBillHistory = async (req, res) => {
       data: rows,
     });
   } catch (error) {
+    console.log('ERROR:', error.message);
     res.status(500).json({
       success: false,
       message: error.message,
