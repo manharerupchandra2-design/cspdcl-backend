@@ -147,7 +147,8 @@ exports.getPendingConsumers = async (req, res) => {
     );
 
     const readerZone = readerRow[0].zone;
-
+const [dateCheck] = await db.execute('SELECT CURDATE() as today, NOW() as now');
+console.log('DB DATE:', dateCheck[0]);
     const [rows] = await db.execute(`
       SELECT
         c.id,
