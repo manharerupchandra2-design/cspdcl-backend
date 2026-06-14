@@ -2,15 +2,38 @@ const db = require("../config/db");
 
 exports.getDashboard = async (req, res) => {
   try {
+    const readerId = req.user.id;  // ← token se
 
-    const [consumer] =
-        await db.execute("SELECT COUNT(*) total FROM consumers");
+    // Reader ka zone nikalo
+    const [readerRow] = await db.execute(
+      'SELECT zone FROM meter_readers WHERE id = ?',
+      [readerId]
+    );
 
-    const [reading] =
-        await db.execute("SELECT COUNT(*) total FROM meter_readings");
+    const readerZone = readerRow[0].zone;
 
-    const [bill] =
-        await db.execute("SELECT COUNT(*) total FROM bills");
+    // Zone wise consumers
+    const [consumer] = await db.execute(
+      "SELECT COUNT(*) total FROM consumers WHERE zone = ?",
+      [readerZone]
+    );
+
+    // Zone wise readings
+    const [reading] = await db.execute(
+      `SELECT COUNT(*) total FROM meter_readings mr
+       JOIN consumers c ON c.id = mr.consumer_id
+       WHERE c.zone = ?`,
+      [readerZone]
+    );
+
+    // Zone wise bills
+    const [bill] = await db.execute(
+      `SELECT COUNT(*) total FROM bills b
+       JOIN meter_readings mr ON mr.id = b.reading_id
+       JOIN consumers c ON c.id = mr.consumer_id
+       WHERE c.zone = ?`,
+      [readerZone]
+    );
 
     res.status(200).json({
       success: true,
