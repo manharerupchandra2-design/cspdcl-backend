@@ -207,27 +207,32 @@ console.log('FILE:', req.file);
 
 exports.getReadingHistory = async (req, res) => {
   try {
+    const readerId = req.user.id; // ← add karo
+
+    const [readerRow] = await db.execute(
+      'SELECT zone FROM meter_readers WHERE id = ?',
+      [readerId]
+    );
+    const readerZone = readerRow[0].zone;
+
     const [rows] = await db.query(`
- SELECT
+      SELECT
         mr.id,
         mr.current_reading,
-        mr.reading_date,
+        mr.reading_date AS created_at,
         mr.meter_photo,
-
         c.id AS consumer_id,
         c.name AS consumer_name,
         c.consumer_no,
-
         m.id AS meter_id,
         m.meter_no
-
       FROM meter_readings mr
       JOIN consumers c ON c.id = mr.consumer_id
       JOIN meters m ON m.id = mr.meter_id
-
+      WHERE c.zone = ?
       ORDER BY mr.reading_date DESC
-    `);
-console.log(rows[0])
+    `, [readerZone]); // ← zone filter
+
     res.status(200).json({
       success: true,
       data: rows,

@@ -9,7 +9,7 @@ const {
   setReading, getReadingHistory
 } = require("../controllers/readingController");
 
-router.get("/history", getReadingHistory)
+router.get("/history", verifyToken, getReadingHistory);
 const uploadMiddleware = (req, res, next) => {
   upload.single('meter_photo')(req, res, (err) => {
     if (err) {
