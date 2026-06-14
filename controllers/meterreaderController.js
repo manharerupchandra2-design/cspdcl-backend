@@ -63,8 +63,8 @@ exports.meterreaderLogin = async (req, res) => {
 exports.meterreaderSignup = async (req, res) => {
   try {
 
-    const { name, mobile, email, password } = req.body;
-    if (!name?.trim() || !mobile?.trim() || !email?.trim() || !password?.trim()) {
+    const { name, mobile, email, password, zone } = req.body;
+    if (!name?.trim() || !mobile?.trim() || !email?.trim() || !password?.trim() || !zone?.trim()) {
       return res.status(400).json({
         success: false,
         message: "All fields are required"
@@ -88,9 +88,9 @@ exports.meterreaderSignup = async (req, res) => {
 
     await db.execute(
       `INSERT INTO meter_readers
-      (name,mobile,email,password)
-      VALUES (?, ?, ?, ?)`,
-      [name, mobile, email, hashedPassword]
+      (name,mobile,zone,email,password)
+      VALUES (?, ?, ?, ?, ?)`,
+      [name, mobile, zone, email, hashedPassword]
     );
 
     res.status(201).json({
