@@ -99,7 +99,7 @@ exports.setBilling = async (req, res) => {
 exports.getBillHistory = async (req, res) => {
   try {
     const readerId = req.user.id; // ← token se
-
+console.log('USER:', req.user);
     const [readerRow] = await db.execute(
       'SELECT zone FROM meter_readers WHERE id = ?',
       [readerId]
@@ -109,21 +109,22 @@ exports.getBillHistory = async (req, res) => {
 
     const [rows] = await db.execute(`
       SELECT
-        b.id AS bill_id,
-        b.amount,
-        c.name AS consumer_name,
-        c.consumer_no,
-        m.meter_no,
-        mr.previous_reading,
-        mr.current_reading,
-        mr.units
-      FROM bills b
-      JOIN meter_readings mr ON mr.id = b.reading_id
-      JOIN consumers c ON c.id = mr.consumer_id
-      JOIN meters m ON m.id = mr.meter_id
-      WHERE c.zone = ?
-      ORDER BY b.created_at DESC
-    `, [readerZone]); // ← zone filter
+    b.id AS bill_id,
+    b.amount,
+    mr.reading_date AS created_at,  // ← yeh change karo
+    c.name AS consumer_name,
+    c.consumer_no,
+    m.meter_no,
+    mr.previous_reading,
+    mr.current_reading,
+    mr.units
+  FROM bills b
+  JOIN meter_readings mr ON mr.id = b.reading_id
+  JOIN consumers c ON c.id = mr.consumer_id
+  JOIN meters m ON m.id = mr.meter_id
+  WHERE c.zone = ?
+  ORDER BY mr.reading_date DESC  // ← yeh bhi change karo
+`, [readerZone]); // ← zone filter
 
     res.status(200).json({
       success: true,
