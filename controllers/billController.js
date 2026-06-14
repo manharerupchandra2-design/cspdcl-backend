@@ -114,7 +114,7 @@ console.log('ZONE:', readerZone);
       SELECT
     b.id AS bill_id,
     b.amount,
-    mr.reading_date AS created_at,  // ← yeh change karo
+    mr.reading_date AS created_at,
     c.name AS consumer_name,
     c.consumer_no,
     m.meter_no,
@@ -126,9 +126,8 @@ console.log('ZONE:', readerZone);
   JOIN consumers c ON c.id = mr.consumer_id
   JOIN meters m ON m.id = mr.meter_id
   WHERE c.zone = ?
-  ORDER BY mr.reading_date DESC  // ← yeh bhi change karo
-`, [readerZone]); // ← zone filter
-
+  ORDER BY mr.reading_date DESC
+`, [readerZone]);
     res.status(200).json({
       success: true,
       data: rows,
