@@ -136,3 +136,49 @@ exports.getConsumerDetail = async (req, res) => {
     });
   }
 };
+
+exports.getPendingConsumers = async (req, res) => {
+  try {
+    const readerId = req.user.id;
+
+    const [readerRow] = await db.execute(
+      'SELECT zone FROM meter_readers WHERE id = ?',
+      [readerId]
+    );
+
+    const readerZone = readerRow[0].zone;
+
+    const [rows] = await db.execute(`
+      SELECT
+        c.id,
+        c.consumer_no,
+        c.name,
+        c.mobile,
+        c.address,
+        m.id AS meter_id,
+        m.meter_no,
+        m.meter_type
+      FROM consumers c
+      LEFT JOIN meters m ON m.consumer_id = c.id
+      WHERE c.zone = ?
+      AND c.id NOT IN (
+        SELECT DISTINCT mr.consumer_id
+        FROM meter_readings mr
+        WHERE DATE(mr.reading_date) = CURDATE()
+      )
+      ORDER BY c.id ASC
+    `, [readerZone]);
+
+    res.status(200).json({
+      success: true,
+      data: rows,
+      total: rows.length
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
