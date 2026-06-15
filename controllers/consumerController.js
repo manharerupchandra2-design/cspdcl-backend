@@ -3,7 +3,7 @@ const db = require("../config/db");
 
 exports.getConsumers = async (req, res) => {
   try {
-    
+
     const readerId = req.user.id;
 
     const [readerRow] = await db.execute(
@@ -146,8 +146,8 @@ exports.getPendingConsumers = async (req, res) => {
     );
 
     const readerZone = readerRow[0].zone;
-const [dateCheck] = await db.execute('SELECT CURDATE() as today, NOW() as now');
-console.log('DB DATE:', dateCheck[0]);
+    const [dateCheck] = await db.execute('SELECT CURDATE() as today, NOW() as now');
+    console.log('DB DATE:', dateCheck[0]);
     const [rows] = await db.execute(`
       SELECT
         c.id,
@@ -169,12 +169,15 @@ console.log('DB DATE:', dateCheck[0]);
       ORDER BY c.id ASC
     `, [readerZone]);
 
-    
+
 
     res.status(200).json({
       success: true,
-      data: rows,
-      total: rows.length
+      message: "Fetched pending consumers",
+      data: {
+        total_consumers: rows.length,
+        consumers: rows
+      }
     });
 
   } catch (error) {
