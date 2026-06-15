@@ -13,10 +13,10 @@ router.get("/history", verifyToken, getReadingHistory);
 const uploadMiddleware = (req, res, next) => {
   upload.single('meter_photo')(req, res, (err) => {
     if (err) {
-      console.log('MULTER ERROR:', err.message);  // ← exact error dikhega
-      return res.status(500).json({ 
-        success: false, 
-        message: err.message 
+      console.log('MULTER ERROR:', err.message);
+      return res.status(500).json({
+        success: false,
+        message: err.message
       });
     }
     next();
@@ -24,8 +24,4 @@ const uploadMiddleware = (req, res, next) => {
 };
 
 router.post("/:consumerId", uploadMiddleware, setReading);
-// router.post("/:consumerId", upload.single('meter_photo'), setReading);
-
-// router.put("/editReading/:reading_id", editReading)
-
 module.exports = router;
