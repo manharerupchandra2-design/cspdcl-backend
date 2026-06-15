@@ -169,8 +169,7 @@ console.log('DB DATE:', dateCheck[0]);
       ORDER BY c.id ASC
     `, [readerZone]);
 
-        print('PENDING STATUS: ${response.statusCode}');
-    print('PENDING BODY: ${response.body}');
+    
 
     res.status(200).json({
       success: true,
