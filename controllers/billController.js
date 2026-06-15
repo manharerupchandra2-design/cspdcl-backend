@@ -57,10 +57,11 @@ exports.setBilling = async (req, res) => {
     const fixed = Number(row2[0].fixed_charge);
 
     const amount = (data.units * rate) + fixed;
-
+const dueDate = new Date();
+dueDate.setDate(dueDate.getDate() + 10);
     const sql3 =
-      `INSERT INTO bills(reading_id,amount)
-       VALUES(?,?)`;
+      `INSERT INTO bills(reading_id,amount,due_date)
+       VALUES(?,?,?)`;
 
     const [result] =
       await db.execute(sql3, [reading_id, amount]);
