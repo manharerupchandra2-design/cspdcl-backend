@@ -10,6 +10,7 @@ exports.setBilling = async (req, res) => {
       SELECT
         c.name,
         c.consumer_no,
+        c.mobile,
         m.meter_no,
         m.meter_type,
         mr.previous_reading,
@@ -85,6 +86,7 @@ exports.setBilling = async (req, res) => {
         bill_id: result.insertId,
         consumer_name: data.name,
         consumer_no: data.consumer_no,
+        consumer_mobile:data.mobile,
         meter_no: data.meter_no,
         previous_reading: data.previous_reading,
         current_reading: data.current_reading,
