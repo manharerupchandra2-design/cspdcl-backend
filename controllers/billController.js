@@ -56,22 +56,30 @@ exports.setBilling = async (req, res) => {
 
     const rate = Number(row2[0].rate_per_unit);
     const fixed = Number(row2[0].fixed_charge);
-    var calculated_amount = (data.units * rate);
+    var calculated_amount = (data.units * rate);//70
+    var half_amount = 0;
+    var amount = 0;
+    var discount_amount = 0;
+    var total_amount = 0;
 
     if (data.units <= 200) {
-      calculated_amount = calculated_amount / 2;
+      half_amount = calculated_amount / 2;//35
+
+      amount = half_amount;
+
+      discount_amount = half_amount - calculated_amount;
+    } else {
+      amount = calculated_amount;
     }
-    const amount = calculated_amount + fixed;
-
-
+    total_amount = amount + fixed;
     const dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + 10);
     const sql3 =
-      `INSERT INTO bills(reading_id,amount,due_date)
-       VALUES(?,?,?)`;
+      `INSERT INTO bills(reading_id,calculated_amount,discount_amount,amount,total_amount,due_date)
+       VALUES(?,?,?,?,?,?)`;
 
     const [result] =
-      await db.execute(sql3, [reading_id, amount,dueDate]);
+      await db.execute(sql3, [reading_id, calculated_amount, discount_amount, amount, dueDate]);
 
 
     if (result.affectedRows > 0) {
@@ -86,14 +94,16 @@ exports.setBilling = async (req, res) => {
         bill_id: result.insertId,
         consumer_name: data.name,
         consumer_no: data.consumer_no,
-        consumer_mobile:data.mobile,
+        consumer_mobile: data.mobile,
         meter_no: data.meter_no,
         previous_reading: data.previous_reading,
         current_reading: data.current_reading,
         units: data.units,
         fixed: fixed,
         calculatedAmount: calculated_amount,
-        amount: amount
+        discountAmount:discount_amount,
+        amount: amount,
+        totalAmount:total_amount
       }
     });
 
