@@ -55,12 +55,12 @@ exports.setBilling = async (req, res) => {
 
     const rate = Number(row2[0].rate_per_unit);
     const fixed = Number(row2[0].fixed_charge);
-    var calculateAmount = (data.units * rate);
+    var calculated_amount = (data.units * rate);
 
     if (data.units <= 200) {
-      calculateAmount = calculateAmount / 2;
+      calculated_amount = calculated_amount / 2;
     }
-    const amount = calculateAmount + fixed;
+    const amount = calculated_amount + fixed;
 
 
     const dueDate = new Date();
@@ -70,7 +70,7 @@ exports.setBilling = async (req, res) => {
        VALUES(?,?,?)`;
 
     const [result] =
-      await db.execute(sql3, [reading_id, amount]);
+      await db.execute(sql3, [reading_id, amount,dueDate]);
 
 
     if (result.affectedRows > 0) {
@@ -89,6 +89,8 @@ exports.setBilling = async (req, res) => {
         previous_reading: data.previous_reading,
         current_reading: data.current_reading,
         units: data.units,
+        fixed: fixed,
+        calculatedAmount: calculated_amount,
         amount: amount
       }
     });
