@@ -55,7 +55,7 @@ exports.setBilling = async (req, res) => {
 
     const rate = Number(row2[0].rate_per_unit);
     const fixed = Number(row2[0].fixed_charge);
-    const calculateAmount = (data.units * rate);
+    var calculateAmount = (data.units * rate);
 
     if (data.units <= 200) {
       calculateAmount = calculateAmount / 2;
