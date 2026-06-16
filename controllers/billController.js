@@ -103,7 +103,8 @@ exports.setBilling = async (req, res) => {
         calculatedAmount: calculated_amount,
         discountAmount:discount_amount,
         amount: amount,
-        totalAmount:total_amount
+        totalAmount:total_amount,
+        dueDate:dueDate
       }
     });
 
