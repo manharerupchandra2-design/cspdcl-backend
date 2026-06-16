@@ -96,7 +96,7 @@ exports.getConsumerDetail = async (req, res) => {
       mr.previous_reading,
       mr.current_reading,
       mr.units,
-      b.amount
+      b.total_amount
 
       FROM meter_readings mr
 
