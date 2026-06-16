@@ -55,10 +55,16 @@ exports.setBilling = async (req, res) => {
 
     const rate = Number(row2[0].rate_per_unit);
     const fixed = Number(row2[0].fixed_charge);
+    const calculateAmount = (data.units * rate);
 
-    const amount = (data.units * rate) + fixed;
-const dueDate = new Date();
-dueDate.setDate(dueDate.getDate() + 10);
+    if (data.units <= 200) {
+      calculateAmount = calculateAmount / 2;
+    }
+    const amount = calculateAmount + fixed;
+
+
+    const dueDate = new Date();
+    dueDate.setDate(dueDate.getDate() + 10);
     const sql3 =
       `INSERT INTO bills(reading_id,amount,due_date)
        VALUES(?,?,?)`;
@@ -67,9 +73,9 @@ dueDate.setDate(dueDate.getDate() + 10);
       await db.execute(sql3, [reading_id, amount]);
 
 
-      if(result.affectedRows>0){
-        await db.execute("update meter_readings set bill_status='Generated' where id=?",[reading_id]);
-      }
+    if (result.affectedRows > 0) {
+      await db.execute("update meter_readings set bill_status='Generated' where id=?", [reading_id]);
+    }
 
     res.status(200).json({
       success: true,
@@ -99,18 +105,18 @@ dueDate.setDate(dueDate.getDate() + 10);
 };
 exports.getBillHistory = async (req, res) => {
   try {
-    const readerId = req.user.id; 
+    const readerId = req.user.id;
 
- console.log('USER:', req.user);        
-    console.log('HEADERS:', req.headers);  
+    console.log('USER:', req.user);
+    console.log('HEADERS:', req.headers);
     const [readerRow] = await db.execute(
       'SELECT zone FROM meter_readers WHERE id = ?',
       [readerId]
     );
-     console.log('READER ROW:', readerRow);
+    console.log('READER ROW:', readerRow);
 
     const readerZone = readerRow[0].zone;
-console.log('ZONE:', readerZone);
+    console.log('ZONE:', readerZone);
     const [rows] = await db.execute(`
       SELECT
     b.id AS bill_id,
