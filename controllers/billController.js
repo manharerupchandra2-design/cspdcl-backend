@@ -79,7 +79,7 @@ exports.setBilling = async (req, res) => {
        VALUES(?,?,?,?,?,?)`;
 
     const [result] =
-      await db.execute(sql3, [reading_id, calculated_amount, discount_amount, amount, dueDate]);
+      await db.execute(sql3, [reading_id, calculated_amount, discount_amount, amount, total_amount,dueDate]);
 
 
     if (result.affectedRows > 0) {
