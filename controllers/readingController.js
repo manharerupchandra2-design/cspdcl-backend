@@ -5,17 +5,18 @@ const upload = require('../middleware/upload');
 
 exports.setReading = async (req, res) => {
   try {
-console.log('BODY type:', typeof req.body);
-console.log('BODY keys:', Object.keys(req.body || {}));
-console.log('FILE type:', typeof req.file);
-console.log('Content-Type:', req.headers['content-type']);
-console.log('BODY:', req.body);
-console.log('FILE:', req.file);
+    console.log('BODY type:', typeof req.body);
+    console.log('BODY keys:', Object.keys(req.body || {}));
+    console.log('FILE type:', typeof req.file);
+    console.log('Content-Type:', req.headers['content-type']);
+    console.log('BODY:', req.body);
+    console.log('FILE:', req.file);
     const { consumerId } = req.params;
 
     const {
       meter_id,
       reader_id,
+      meter_type,
       current_reading,
 
     } = req.body;
@@ -49,6 +50,15 @@ console.log('FILE:', req.file);
 
     const unitsConsumed =
       current_reading - previousReading;
+
+    const sql1 = "select max(max_units) from tariffs where category=?";
+    const maxUnits = await db.query(sql1, meter_type)
+    if (current_reading > maxUnits[0]['max_units']) {
+      return res.status(400).json({
+        success: false,
+        message: "Not possible"
+      })
+    }
 
     if (unitsConsumed < 0) {
       return res.status(400).json({
@@ -98,7 +108,7 @@ console.log('FILE:', req.file);
 
 exports.getReadingHistory = async (req, res) => {
   try {
-    const readerId = req.user.id; 
+    const readerId = req.user.id;
 
     const [readerRow] = await db.execute(
       'SELECT zone FROM meter_readers WHERE id = ?',
@@ -122,7 +132,7 @@ exports.getReadingHistory = async (req, res) => {
       JOIN meters m ON m.id = mr.meter_id
       WHERE c.zone = ?
       ORDER BY mr.reading_date DESC
-    `, [readerZone]); 
+    `, [readerZone]);
 
     res.status(200).json({
       success: true,
