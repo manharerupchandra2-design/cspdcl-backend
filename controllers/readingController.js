@@ -36,7 +36,7 @@ exports.setReading = async (req, res) => {
 
     
 
-    const sql1 = "select max(max_units) from tariffs where category=?";
+    const sql1 = "select max(max_units) as max_units from tariffs where category=?";
     const [rows] = await db.query(sql1, [meter_type])
     const maxUnits = rows[0]?.max_units??0;
     if (current_reading > maxUnits) {
