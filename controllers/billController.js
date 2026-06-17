@@ -135,7 +135,7 @@ exports.getBillHistory = async (req, res) => {
     const [rows] = await db.execute(`
       SELECT
     b.id AS bill_id,
-    b.amount,
+    b.total_amount,
     mr.reading_date AS created_at,
     c.name AS consumer_name,
     c.consumer_no,
