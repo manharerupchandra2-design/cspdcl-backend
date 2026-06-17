@@ -52,14 +52,14 @@ exports.setReading = async (req, res) => {
       current_reading - previousReading;
 
     const sql1 = "select max(max_units) from tariffs where category=?";
-    const maxUnits = await db.query(sql1, meter_type)
-    if (current_reading > maxUnits[0]['max_units']) {
+    const [rows] = await db.query(sql1, [meter_type])
+    const maxUnits = rows[0]?.max_units??0;
+    if (current_reading > maxUnits) {
       return res.status(400).json({
         success: false,
         message: "Not possible"
       })
     }
-
     if (unitsConsumed < 0) {
       return res.status(400).json({
         success: false,
