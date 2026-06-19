@@ -18,11 +18,13 @@ exports.setReading = async (req, res) => {
       reader_id,
       meter_type,
       current_reading,
-
+      force_submit,
     } = req.body;
+
     const meter_photo = req.file
       ? req.file.path
       : null;
+
     if (
       !meter_id ||
       !reader_id ||
@@ -34,7 +36,25 @@ exports.setReading = async (req, res) => {
       });
     }
 
-    
+    const [existingThisMonth] = await db.query(
+      `SELECT id, current_reading, reading_date
+       FROM meter_readings
+       WHERE consumer_id = ?
+         AND MONTH(reading_date) = MONTH(CURDATE())
+         AND YEAR(reading_date) = YEAR(CURDATE())
+       ORDER BY id DESC
+       LIMIT 1`,
+      [consumerId]
+    );
+
+    if (existingThisMonth.length > 0 && force_submit !== true && force_submit !== "true") {
+      return res.status(409).json({
+        success: false,
+        code: "ALREADY_READ_THIS_MONTH", 
+        message: "already recorder this month",
+        existing_reading: existingThisMonth[0],
+      });
+    }
 
     const sql1 = "select max(max_units) as max_units from tariffs where category=?";
     const [rows] = await db.query(sql1, [meter_type])
@@ -80,7 +100,6 @@ exports.setReading = async (req, res) => {
         current_reading,
         units,
         meter_photo
-      
       )
       VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [
