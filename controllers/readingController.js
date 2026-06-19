@@ -51,7 +51,7 @@ exports.setReading = async (req, res) => {
       return res.status(409).json({
         success: false,
         code: "ALREADY_READ_THIS_MONTH", 
-        message: "already recorde for this month",
+        message: "already recorded for this month",
         existing_reading: existingThisMonth[0],
       });
     }
